@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scholtrix CV Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Professional CV Generator</h1>
+  <p>Create a global standard CV in minutes</p>
+</header>
+
+<main class="container-main">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="step-indicators">
+      <span class="step-indicator active" data-step="1">1. Personal</span>
+      <span class="step-indicator" data-step="2">2. Summary</span>
+      <span class="step-indicator" data-step="3">3. Skills</span>
+      <span class="step-indicator" data-step="4">4. Experience</span>
+      <span class="step-indicator" data-step="5">5. Education</span>
+      <span class="step-indicator" data-step="6">6. Certifications</span>
+      <span class="step-indicator" data-step="7">7. Languages</span>
+      <span class="step-indicator" data-step="8">8. Projects</span>
+      <span class="step-indicator" data-step="9">9. Awards</span>
+      <span class="step-indicator" data-step="10">10. Interests</span>
+      <span class="step-indicator" data-step="11">11. References</span>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <form id="cvForm">
+
+      <!-- Step 1: Personal Information -->
+      <div class="form-step active" data-step="1">
+        <h2>Personal Information</h2>
+        <input type="text" placeholder="Full Name" name="fullName" data-validate="name" required>
+        <input type="email" placeholder="Email Address (e.g., name@gmail.com)" name="email" required>
+        <input type="text" placeholder="Phone Number (numbers and + only)" name="phone" data-validate="phone">
+        <input type="text" placeholder="Job Title" name="jobTitle" data-validate="name">
+        <input type="text" placeholder="Address" name="address">
+        <input type="text" placeholder="City" name="city">
+        <input type="text" placeholder="Country" name="country">
+        <input type="url" placeholder="LinkedIn Profile" name="linkedin">
+        <input type="url" placeholder="Portfolio / Website" name="portfolio">
+      </div>
+
+      <!-- Step 2: Professional Summary -->
+      <div class="form-step" data-step="2">
+        <h2>Professional Summary</h2>
+        <textarea name="summary" placeholder="Write a powerful professional summary" rows="6"></textarea>
+      </div>
+
+      <!-- Step 3: Skills -->
+      <div class="form-step" data-step="3">
+        <h2>Skills</h2>
+        <textarea name="skills" placeholder="List your skills (comma separated)" rows="6"></textarea>
+      </div>
+
+      <!-- Step 4: Work Experience -->
+      <div class="form-step" data-step="4">
+        <h2>Work Experience</h2>
+        <div id="experienceContainer">
+          <div class="experience card">
+            <input type="text" placeholder="Job Title" name="jobTitle[]" data-validate="name">
+            <input type="text" placeholder="Company" name="company[]" data-validate="name">
+            <input type="text" placeholder="Location" name="location[]" data-validate="name">
+            <label>Start Date:</label>
+            <input type="month" name="startDate[]">
+            <label>End Date:</label>
+            <input type="month" name="endDate[]">
+            <textarea placeholder="Responsibilities / Achievements" name="responsibilities[]" rows="4"></textarea>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addExperience()">+ Add Experience</button>
+      </div>
+
+      <!-- Step 5: Education -->
+      <div class="form-step" data-step="5">
+        <h2>Education</h2>
+        <div id="educationContainer">
+          <div class="education card">
+            <input type="text" placeholder="Institution" name="institution[]" data-validate="name">
+            <input type="text" placeholder="Degree" name="degree[]" data-validate="name">
+            <input type="text" placeholder="Field of Study" name="field[]" data-validate="name">
+            <label>Start Date:</label>
+            <input type="month" name="eduStart[]">
+            <label>End Date:</label>
+            <input type="month" name="eduEnd[]">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addEducation()">+ Add Education</button>
+      </div>
+
+      <!-- Step 6: Certifications -->
+      <div class="form-step" data-step="6">
+        <h2>Certifications</h2>
+        <div id="certificationContainer">
+          <div class="certification card">
+            <input type="text" placeholder="Certification Name" name="certName[]" data-validate="name">
+            <input type="text" placeholder="Issuing Organization" name="certOrg[]" data-validate="name">
+            <label>Issue Date:</label>
+            <input type="month" name="certDate[]">
+            <label>Expiry Date (optional):</label>
+            <input type="month" name="certExpiry[]">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addCertification()">+ Add Certification</button>
+      </div>
+
+      <!-- Step 7: Languages -->
+      <div class="form-step" data-step="7">
+        <h2>Languages</h2>
+        <div id="languageContainer">
+          <div class="language card">
+            <input type="text" placeholder="Language" name="language[]" data-validate="name">
+            <select name="proficiency[]">
+              <option value="">Select Proficiency</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+              <option value="Native">Native</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addLanguage()">+ Add Language</button>
+      </div>
+
+      <!-- Step 8: Projects -->
+      <div class="form-step" data-step="8">
+        <h2>Projects</h2>
+        <div id="projectContainer">
+          <div class="project card">
+            <input type="text" placeholder="Project Name" name="projectName[]" data-validate="name">
+            <textarea placeholder="Description" name="projectDesc[]" rows="4"></textarea>
+            <input type="text" placeholder="Technologies Used" name="projectTech[]">
+            <input type="url" placeholder="Project Link (optional)" name="projectLink[]">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addProject()">+ Add Project</button>
+      </div>
+
+      <!-- Step 9: Awards & Achievements -->
+      <div class="form-step" data-step="9">
+        <h2>Awards & Achievements</h2>
+        <div id="awardContainer">
+          <div class="award card">
+            <input type="text" placeholder="Award Name" name="awardName[]" data-validate="name">
+            <input type="text" placeholder="Issuer" name="awardIssuer[]" data-validate="name">
+            <label>Award Date:</label>
+            <input type="month" name="awardDate[]">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addAward()">+ Add Award</button>
+      </div>
+
+      <!-- Step 10: Interests -->
+      <div class="form-step" data-step="10">
+        <h2>Interests</h2>
+        <div id="interestContainer">
+          <div class="interest card">
+            <input type="text" placeholder="Interest" name="interest[]" data-validate="name">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addInterest()">+ Add Interest</button>
+      </div>
+
+      <!-- Step 11: References -->
+      <div class="form-step" data-step="11">
+        <h2>References</h2>
+        <div id="referenceContainer">
+          <div class="reference card">
+            <input type="text" placeholder="Name" name="refName[]" data-validate="name">
+            <input type="text" placeholder="Position" name="refPosition[]" data-validate="name">
+            <input type="text" placeholder="Company" name="refCompany[]" data-validate="name">
+            <input type="email" placeholder="Email (e.g., name@gmail.com)" name="refEmail[]">
+            <input type="text" placeholder="Phone (numbers and + only)" name="refPhone[]" data-validate="phone">
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addReference()">+ Add Reference</button>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="form-navigation">
+        <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)">← Previous</button>
+        <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Next →</button>
+        <button type="submit" class="btn btn-success" id="submitBtn">Generate CV</button>
+      </div>
+
+    </form>
+
+    <!-- CV Preview -->
+    <section id="cvPreview" class="cv-preview-section">
+      <h2>CV Preview</h2>
+      <div id="previewContent" class="preview-a4"></div>
+    </section>
+  </div>
+
+</main>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <h3>Generate CV?</h3>
+    <p>Ready to preview and print your CV?</p>
+    <div class="modal-buttons">
+      <button id="confirmYes" class="btn btn-success">Yes, Print Preview</button>
+      <button id="confirmNo" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
