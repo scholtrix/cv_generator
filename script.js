@@ -1,6 +1,7 @@
 // Load saved CV data
 function loadCVData() {
-  const cvData = auth.getCVData();
+  // Stub for auth - remove or implement localStorage
+  const cvData = null; // auth.getCVData() - commented out as auth is not defined
   if (!cvData || Object.keys(cvData).length === 0) {
     console.log('No CV data found');
     return;
@@ -179,6 +180,7 @@ function loadCVData() {
       if (ref.phone) refElement.querySelector('[name="refPhone[]"]').value = ref.phone;
     });
   }
+}
 
 function addExperience() {
   const container = document.getElementById('experienceContainer');
@@ -297,46 +299,93 @@ function attachEventListeners(element) {
   names.forEach(name => {
     name.addEventListener('input', validateName);
   });
+  
+  // Handle current job checkboxes
+  const currentJobCheckboxes = element.querySelectorAll('.currentJob');
+  currentJobCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      handleCurrentJobToggle(this);
+    });
+  });
+  
+  // Handle current study checkboxes
+  const currentStudyCheckboxes = element.querySelectorAll('.currentStudy');
+  currentStudyCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      handleCurrentStudyToggle(this);
+    });
+  });
 }
 
 // Global variables
 let currentStep = 1;
 const totalSteps = 11;
 
+// Direct step navigation - allows clicking on step indicators
+function goToStep(step) {
+  const newStep = parseInt(step);
+  
+  if (newStep < 1 || newStep > totalSteps) return;
+  
+  // If going forward, validate current step
+  if (newStep > currentStep) {
+    const isValid = validateStep(currentStep);
+    if (!isValid) {
+      alert('Please fill in required fields:\n- Full Name\n- Email Address');
+      return;
+    }
+  }
+  
+  currentStep = newStep;
+  updateStepDisplay();
+  updateProgressBar();
+}
+
+// Handle current job checkbox
+function handleCurrentJobToggle(checkbox) {
+  const experience = checkbox.closest('.experience');
+  const endDateInput = experience.querySelector('input[name="endDate[]"]');
+  if (checkbox.checked) {
+    endDateInput.value = '';
+    endDateInput.disabled = true;
+    endDateInput.style.opacity = '0.5';
+  } else {
+    endDateInput.disabled = false;
+    endDateInput.style.opacity = '1';
+  }
+  updatePreview();
+}
+
+// Handle current study checkbox
+function handleCurrentStudyToggle(checkbox) {
+  const education = checkbox.closest('.education');
+  const endDateInput = education.querySelector('input[name="eduEnd[]"]');
+  if (checkbox.checked) {
+    endDateInput.value = '';
+    endDateInput.disabled = true;
+    endDateInput.style.opacity = '0.5';
+  } else {
+    endDateInput.disabled = false;
+    endDateInput.style.opacity = '1';
+  }
+  updatePreview();
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('cvForm');
-  const inputs = form.querySelectorAll('input, textarea, select');
-  
-  inputs.forEach(input => {
-    input.addEventListener('input', updatePreview);
-    input.addEventListener('change', updatePreview);
-    input.addEventListener('input', handleValidation);
-    
-    if (input.type === 'month') {
-      input.addEventListener('change', validateDates);
+  try {
+    const form = document.getElementById('cvForm');
+    if (!form) {
+      console.error('Form element not found');
+      return;
     }
-  });
-  
-  // Add email and phone validation
-  form.querySelectorAll('input[type="email"]').forEach(email => {
-    email.addEventListener('input', validateEmail);
-    email.addEventListener('blur', validateEmail);
-  });
-  
-  form.querySelectorAll('input[data-validate="phone"]').forEach(phone => {
-    phone.addEventListener('input', validatePhone);
-  });
-  
-  form.querySelectorAll('input[data-validate="name"]').forEach(name => {
-
-  const form = document.getElementById('cvForm');
-  const inputs = form.querySelectorAll('input, textarea, select');
-  
-  inputs.forEach(input => {
-    input.addEventListener('input', updatePreview);
-    input.addEventListener('change', updatePreview);
-    input.addEventListener('input', handleValidation);
+    
+    const inputs = form.querySelectorAll('input, textarea, select');
+    
+    inputs.forEach(input => {
+      input.addEventListener('input', updatePreview);
+      input.addEventListener('change', updatePreview);
+      input.addEventListener('input', handleValidation);
     
     if (input.type === 'month') {
       input.addEventListener('change', validateDates);
@@ -357,10 +406,52 @@ document.addEventListener('DOMContentLoaded', function() {
     name.addEventListener('input', validateName);
   });
   
-  updatePreview();
-  validateDates();
-  updateProgressBar();
-  updateStepDisplay();
+  // Add current job checkbox listeners
+  form.querySelectorAll('.currentJob').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      handleCurrentJobToggle(this);
+    });
+  });
+  
+  // Add current study checkbox listeners
+  form.querySelectorAll('.currentStudy').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      handleCurrentStudyToggle(this);
+    });
+  });
+  
+    updatePreview();
+    validateDates();
+    updateProgressBar();
+    updateStepDisplay();
+    
+    // Setup form submission handler
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        alert('Please correct any errors in the form.');
+        return;
+      }
+      showModal();
+    });
+    
+    // Setup modal buttons
+    const confirmYesBtn = document.getElementById('confirmYes');
+    const confirmNoBtn = document.getElementById('confirmNo');
+    if (confirmYesBtn) {
+      confirmYesBtn.addEventListener('click', function() {
+        document.getElementById('confirmationModal').style.display = 'none';
+        showPrintPreview();
+      });
+    }
+    if (confirmNoBtn) {
+      confirmNoBtn.addEventListener('click', function() {
+        document.getElementById('confirmationModal').style.display = 'none';
+      });
+    }
+  } catch (error) {
+    console.error('Error initializing form:', error);
+  }
 });
 
 // Handle all validations
@@ -381,10 +472,13 @@ function changeStep(direction) {
   
   if (newStep < 1 || newStep > totalSteps) return;
   
-  // Validate current step before moving
-  if (direction > 0 && !validateStep(currentStep)) {
-    alert('Please fill in required fields or correct errors in this step.');
-    return;
+  // Validate current step before moving (only validate when going forward)
+  if (direction > 0) {
+    const isValid = validateStep(currentStep);
+    if (!isValid) {
+      alert('Please fill in required fields:\n- Full Name\n- Email Address');
+      return;
+    }
   }
   
   currentStep = newStep;
@@ -424,7 +518,7 @@ function updateProgressBar() {
 // Validation Functions
 function validateStep(step) {
   const form = document.getElementById('cvForm');
-  const requiredFields = form.querySelectorAll(`[data-step="${step}"] input[required], [data-step="${step}"] textarea[required]`);
+  const requiredFields = form.querySelectorAll(`.form-step[data-step="${step}"] input[required], .form-step[data-step="${step}"] textarea[required]`);
   
   for (let field of requiredFields) {
     if (!field.value.trim()) {
@@ -533,33 +627,10 @@ function validateDates() {
   });
 }
 
-// Form submission handler
-document.getElementById('cvForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  // Final validation
-  const form = e.target;
-  if (!form.checkValidity()) {
-    alert('Please correct any errors in the form.');
-    return;
-  }
-  
-  showModal();
-});
-
-// Modal Confirmation
+// Modal Confirmation Helper
 function showModal() {
   document.getElementById('confirmationModal').style.display = 'block';
 }
-
-document.getElementById('confirmYes').addEventListener('click', function() {
-  document.getElementById('confirmationModal').style.display = 'none';
-  showPrintPreview();
-});
-
-document.getElementById('confirmNo').addEventListener('click', function() {
-  document.getElementById('confirmationModal').style.display = 'none';
-});
 
 // Print Preview
 function showPrintPreview() {
@@ -567,10 +638,17 @@ function showPrintPreview() {
 }
 
 function updatePreview() {
-  const formData = new FormData(document.getElementById('cvForm'));
-  const previewContent = document.querySelector('.preview-a4');
-  
-  let cvHTML = '';
+  try {
+    const formElement = document.getElementById('cvForm');
+    const previewContent = document.querySelector('.preview-a4');
+    
+    if (!formElement || !previewContent) {
+      console.warn('Form or preview element not found');
+      return;
+    }
+    
+    const formData = new FormData(formElement);
+    let cvHTML = '';
   
   // Personal Information
   const fullName = formData.get('fullName') || 'Your Name';
@@ -623,15 +701,17 @@ function updatePreview() {
   const startDates = formData.getAll('startDate[]');
   const endDates = formData.getAll('endDate[]');
   const responsibilities = formData.getAll('responsibilities[]');
+  const currentJobs = formData.getAll('currentJob[]');
   
   if (jobTitles.some(title => title.trim())) {
     cvHTML += '<div class="cv-section"><h3>Work Experience</h3>';
     jobTitles.forEach((title, i) => {
       if (title.trim()) {
+        const endDate = currentJobs[i] === 'on' ? 'Present' : formatDate(endDates[i]);
         cvHTML += `
           <div class="cv-item">
             <h4>${title} at ${companies[i] || ''}</h4>
-            <div class="details">${locations[i] ? locations[i] + ' | ' : ''}${formatDate(startDates[i])} - ${formatDate(endDates[i])}</div>
+            <div class="details">${locations[i] ? locations[i] + ' | ' : ''}${formatDate(startDates[i])} - ${endDate}</div>
             <p>${responsibilities[i] || ''}</p>
           </div>
         `;
@@ -646,15 +726,17 @@ function updatePreview() {
   const fields = formData.getAll('field[]');
   const eduStarts = formData.getAll('eduStart[]');
   const eduEnds = formData.getAll('eduEnd[]');
+  const currentStudies = formData.getAll('currentStudy[]');
   
   if (institutions.some(inst => inst.trim())) {
     cvHTML += '<div class="cv-section"><h3>Education</h3>';
     institutions.forEach((inst, i) => {
       if (inst.trim()) {
+        const endDate = currentStudies[i] === 'on' ? 'Present' : formatDate(eduEnds[i]);
         cvHTML += `
           <div class="cv-item">
             <h4>${degrees[i] || ''} in ${fields[i] || ''}</h4>
-            <div class="details">${inst} | ${formatDate(eduStarts[i])} - ${formatDate(eduEnds[i])}</div>
+            <div class="details">${inst} | ${formatDate(eduStarts[i])} - ${endDate}</div>
           </div>
         `;
       }
@@ -768,9 +850,13 @@ function updatePreview() {
     cvHTML += '</div>';
   }
   
-  previewContent.innerHTML = cvHTML;
+    previewContent.innerHTML = cvHTML;
+  } catch (error) {
+    console.error('Error updating preview:', error);
+  }
 
-  // Auto-save CV data
+  // Auto-save CV data (optional enhancement)
+  /*
   const cvData = {
     personalInfo: {
       fullName: formData.get('fullName') || '',
@@ -830,6 +916,8 @@ function updatePreview() {
       phone: refPhones[i] || ''
     })).filter(ref => ref.name.trim())
   };
+  */  
+}
 
 function formatDate(dateString) {
   if (!dateString) return 'Present';
