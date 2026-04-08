@@ -21,17 +21,17 @@
       <div class="progress-fill" id="progressFill"></div>
     </div>
     <div class="step-indicators">
-      <span class="step-indicator active" data-step="1">1. Personal</span>
-      <span class="step-indicator" data-step="2">2. Summary</span>
-      <span class="step-indicator" data-step="3">3. Skills</span>
-      <span class="step-indicator" data-step="4">4. Experience</span>
-      <span class="step-indicator" data-step="5">5. Education</span>
-      <span class="step-indicator" data-step="6">6. Certifications</span>
-      <span class="step-indicator" data-step="7">7. Languages</span>
-      <span class="step-indicator" data-step="8">8. Projects</span>
-      <span class="step-indicator" data-step="9">9. Awards</span>
-      <span class="step-indicator" data-step="10">10. Interests</span>
-      <span class="step-indicator" data-step="11">11. References</span>
+      <span class="step-indicator active" data-step="1" onclick="goToStep(1)">1. Personal</span>
+      <span class="step-indicator" data-step="2" onclick="goToStep(2)">2. Summary</span>
+      <span class="step-indicator" data-step="3" onclick="goToStep(3)">3. Skills</span>
+      <span class="step-indicator" data-step="4" onclick="goToStep(4)">4. Experience</span>
+      <span class="step-indicator" data-step="5" onclick="goToStep(5)">5. Education</span>
+      <span class="step-indicator" data-step="6" onclick="goToStep(6)">6. Certifications</span>
+      <span class="step-indicator" data-step="7" onclick="goToStep(7)">7. Languages</span>
+      <span class="step-indicator" data-step="8" onclick="goToStep(8)">8. Projects</span>
+      <span class="step-indicator" data-step="9" onclick="goToStep(9)">9. Awards</span>
+      <span class="step-indicator" data-step="10" onclick="goToStep(10)">10. Interests</span>
+      <span class="step-indicator" data-step="11" onclick="goToStep(11)">11. References</span>
     </div>
   </div>
 
@@ -76,6 +76,10 @@
             <input type="month" name="startDate[]">
             <label>End Date:</label>
             <input type="month" name="endDate[]">
+            <label class="checkbox-label">
+              <input type="checkbox" class="currentJob" name="currentJob[]">
+              <span>I currently work here</span>
+            </label>
             <textarea placeholder="Responsibilities / Achievements" name="responsibilities[]" rows="4"></textarea>
           </div>
         </div>
@@ -94,6 +98,10 @@
             <input type="month" name="eduStart[]">
             <label>End Date:</label>
             <input type="month" name="eduEnd[]">
+            <label class="checkbox-label">
+              <input type="checkbox" class="currentStudy" name="currentStudy[]">
+              <span>I currently study here</span>
+            </label>
           </div>
         </div>
         <button type="button" class="btn-add" onclick="addEducation()">+ Add Education</button>
@@ -220,3 +228,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
